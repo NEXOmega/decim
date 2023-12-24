@@ -1,7 +1,7 @@
 use clap::{arg, Command};
 use tabled::{settings::Style, Table};
 use crate::managers::game_manager;
-use crate::managers::game_manager::{search_games, display_game, start_game, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
+use crate::managers::game_manager::{search_games, start_game, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
 
 pub fn handle_command() {
     let matches = cli().get_matches();
@@ -41,14 +41,45 @@ pub fn handle_command() {
         },
         Some(("create", sub_m)) => {
             let name = sub_m.get_one::<String>("NAME").unwrap();
-            let description: Vec<_> = sub_m.get_many::<String>("DESCRIPTION").expect("Error while getting description").map(|x| x.as_str()).collect();
+
+            if load_game(format!("{}.json", name)).is_some() {
+                println!("Game already exists");
+                return;
+            }
+
+            let description = sub_m.get_many::<String>("DESCRIPTION").unwrap();
+            let description: Vec<_> = description.map(|x| x.as_str()).collect();
             let description = description.join(" ");
-            let version = sub_m.get_one::<String>("VERSION").unwrap();
-            let executable = sub_m.get_one::<String>("EXECUTABLE").unwrap();
+
             let mut game = crate::utils::game::Game::new(name.to_string(), description.to_string());
-            game.edit_version(version.to_string());
-            game.edit_executable(executable.to_string());
+
+            if let Some(version) = sub_m.get_one::<String>("VERSION") {
+                game.edit_version(version.to_string());
+            }
+
+            if let Some(save_location) = sub_m.get_one::<String>("SAVE_LOCATION") {
+                game.edit_save_location(save_location.to_string());
+            }
+
+            if let Some(executable) = sub_m.get_one::<String>("EXECUTABLE") {
+                game.edit_executable(executable.to_string());
+            }
+
+            if let Some(tags) = sub_m.get_many::<String>("TAGS") {
+                let tags: Vec<_> = tags.map(|x| x.as_str()).collect();
+                for tag in tags {
+                    game.add_tag(tag.to_string());
+                }
+            }
+
+            if let Some(tags) = sub_m.get_many::<String>("REMOVE_TAGS") {
+                let tags: Vec<_> = tags.map(|x| x.as_str()).collect();
+                for tag in tags {
+                    game.remove_tag(tag.to_string());
+                }
+            }
             game_manager::save_game(game);
+            println!("Game {} created", name);
         },
         Some(("edit", _sub_m)) => {
             let game_name = _sub_m.get_one::<String>("NAME").unwrap();
@@ -155,19 +186,38 @@ pub fn cli() -> Command {
             Command::new("create")
                 .about("Create a game")
                 .arg(arg!(<NAME> "The name of the game to create").required(true))
-                .arg(arg!(<DESCRIPTION> "The description of the game to create").required(true).num_args(1..))
+                .arg(arg!(<DESCRIPTION> "The description of the game to create")
+                    .required(true)
+                    .num_args(1..)
+                )
                 .arg(arg!(<VERSION> "The version of the game to create")
                     .short('v')
                     .long("version")
-                    .default_value("0")
                     .required(false)
                 )
                 .arg(arg!(<EXECUTABLE> "The executable of the game to create")
                     .short('e')
                     .long("executable")
-                    .default_value("")
                     .required(false)
                 )
+                .arg(arg!(<SAVE_LOCATION> "The save location of the game to edit")
+                    .short('s')
+                    .long("save_location")
+                    .required(false)
+                )
+                .arg(arg!(<TAGS>... "Add Tags")
+                    .short('t')
+                    .long("add_tags")
+                    .num_args(1..)
+                    .required(false)
+                )
+                .arg(arg!(<REMOVE_TAGS>... "Remove Tags")
+                    .short('r')
+                    .long("remove_tags")
+                    .num_args(1..)
+                    .required(false)
+                )
+                .arg_required_else_help(true)
         )
         .subcommand(
             Command::new("edit")

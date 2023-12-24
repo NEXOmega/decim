@@ -22,15 +22,6 @@ pub(crate) fn start_game(string: String) {
     utils::file_runner::run_file(game.get_executable());
 }
 
-pub(crate) fn display_game(game: Game) {
-    println!("Name: {}", game.get_name());
-    println!("Description: {}", game.get_description());
-    println!("Tags: {}", game.get_tags().join(", "));
-    println!("Version: {}", game.get_version());
-    println!("Save Location: {}", game.get_save_location());
-    println!("Executable: {}", game.get_executable());
-}
-
 fn list_games() -> Vec<Game> {
     let mut games: Vec<Game> = Vec::new();
     for entry in std::fs::read_dir(utils::get_game_dir()).unwrap() {
