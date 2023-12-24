@@ -67,10 +67,6 @@ impl Game {
         self.name.clone()
     }
 
-    pub fn get_description(&self) -> String {
-        self.description.clone()
-    }
-
     pub fn get_tags(&self) -> Vec<String> {
         self.tags.clone()
     }

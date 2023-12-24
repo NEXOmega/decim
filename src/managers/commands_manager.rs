@@ -1,13 +1,13 @@
 use clap::{arg, Command};
 use tabled::{settings::Style, Table};
 use crate::managers::game_manager;
-use crate::managers::game_manager::{search_games, start_game, list_games, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
+use crate::managers::game_manager::{search_games, start_game, list_games, delete_game, load_game, backup, backup_all, search_games_by_tags};
 
 pub fn handle_command() {
     let matches = cli().get_matches();
 
     match matches.subcommand() {
-        Some(("start", sub_m)) => {
+        Some(("launch", sub_m)) => {
             let game_name = sub_m.get_one::<String>("NAME").unwrap();
             start_game(format!("{}.json", game_name));
         },
@@ -23,12 +23,6 @@ pub fn handle_command() {
         Some(("search", sub_m)) => {
             let game_name = sub_m.get_one::<String>("NAME").unwrap();
             let games = search_games(game_name.to_string());
-            let table = Table::new(&games).with(Style::modern()).to_string();
-            println!("{}", table);
-        },
-        Some(("search-tag", sub_m)) => {
-            let tag = sub_m.get_one::<String>("TAG").unwrap();
-            let games = search_games_by_tag(tag.to_string());
             let table = Table::new(&games).with(Style::modern()).to_string();
             println!("{}", table);
         },
@@ -133,7 +127,7 @@ pub fn handle_command() {
             }
             backup(game.unwrap());
         },
-        Some(("backup_all", _sub_m)) => {
+        Some(("backup-all", _sub_m)) => {
             backup_all();
         },
         _ => println!("Command not found"),
@@ -149,9 +143,9 @@ pub fn cli() -> Command {
         .arg_required_else_help(true)
         .allow_external_subcommands(true)
         .subcommand(
-            Command::new("start")
-                .short_flag('S')
-                .long_flag("start")
+            Command::new("launch")
+                .short_flag('L')
+                .long_flag("launch")
                 .about("Start a game")
                 .arg(arg!(<NAME> "The name of the game to start"))
                 .arg_required_else_help(true)
@@ -168,12 +162,6 @@ pub fn cli() -> Command {
                 .about("Search a game")
                 .short_flag('s')
                 .arg(arg!(<NAME> "The name of the game to search"))
-                .arg_required_else_help(true)
-        )
-        .subcommand(
-            Command::new("search-tag")
-                .about("Search a game by tag")
-                .arg(arg!(<TAG> "The tag of the game to search"))
                 .arg_required_else_help(true)
         )
         .subcommand(

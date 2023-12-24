@@ -68,7 +68,7 @@ pub fn edit_game(game: Game) {
 pub fn search_games(search: String) -> Vec<Game> {
     let mut games_distance: Vec<(Game, usize)> = Vec::new();
     for game in list_games() {
-        let mut distance = edit_distance::edit_distance(&game.get_name(), &search);
+        let distance = edit_distance::edit_distance(&game.get_name(), &search);
         games_distance.push((game, distance));
     }
 
@@ -79,27 +79,6 @@ pub fn search_games(search: String) -> Vec<Game> {
     let mut games: Vec<Game> = Vec::new();
     for game in games_distance {
         games.push(game.0);
-    }
-    games
-}
-
-pub fn search_games_by_tag(search: String) -> Vec<Game> {
-    let mut games: Vec<Game> = Vec::new();
-    for entry in std::fs::read_dir(utils::get_game_dir()).unwrap() {
-        let path = entry.unwrap().path();
-        let file_name = path.file_name().unwrap().to_str().unwrap();
-        if file_name.ends_with(".json") {
-            let game = load_game(String::from(file_name));
-            if game.is_none() {
-                continue;
-            }
-            let game = game.unwrap();
-            for tag in game.get_tags() {
-                if tag.contains(&search) {
-                    games.push(game.clone());
-                }
-            }
-        }
     }
     games
 }
