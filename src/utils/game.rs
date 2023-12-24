@@ -15,12 +15,15 @@ pub struct Game {
     #[arg(short, long, default_value_t= String::from("0.1.0"))]
     pub version: String,
     #[arg(short, long)]
-    #[tabled(display_with = "display_tags")]
+    #[tabled(display_with = "display_vec_str")]
     pub tags: Vec<String>,
     #[arg(short, long, default_value_t = String::from(""))]
     pub save_location: String,
     #[arg(short, long, default_value_t = String::from(""))]
     pub executable: String,
+    #[arg(short, long)]
+    #[tabled(display_with = "display_vec_str")]
+    pub version_history: Vec<String>,
 }
 
 impl Game {
@@ -32,6 +35,7 @@ impl Game {
             version: String::from(""),
             save_location: String::from(""),
             executable: String::from(""),
+            version_history: Vec::new(),
         }
     }
 
@@ -45,6 +49,9 @@ impl Game {
     }
 
     pub fn edit_version(&mut self, version: String) {
+        if self.version != String::from("") {
+            self.version_history.push(self.version.clone());
+        }
         self.version = version;
     }
 
@@ -81,7 +88,7 @@ impl Game {
     }
 }
 
-fn display_tags(tags: &Vec<String>) -> String {
+fn display_vec_str(tags: &Vec<String>) -> String {
     let mut tags = tags.clone();
     tags.sort();
     tags.join(", ")

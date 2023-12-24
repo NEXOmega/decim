@@ -48,7 +48,7 @@ pub fn handle_command() {
             let mut game = crate::utils::game::Game::new(name.to_string(), description.to_string());
             game.edit_version(version.to_string());
             game.edit_executable(executable.to_string());
-            crate::managers::game_manager::save_game(game);
+            game_manager::save_game(game);
         },
         Some(("edit", _sub_m)) => {
             let game_name = _sub_m.get_one::<String>("NAME").unwrap();
@@ -159,7 +159,7 @@ pub fn cli() -> Command {
                 .arg(arg!(<VERSION> "The version of the game to create")
                     .short('v')
                     .long("version")
-                    .default_value("0.1.0")
+                    .default_value("0")
                     .required(false)
                 )
                 .arg(arg!(<EXECUTABLE> "The executable of the game to create")
