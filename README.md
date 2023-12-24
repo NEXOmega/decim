@@ -10,5 +10,5 @@ TODO :
 - [ ] Add restore for backups
 - [*] Add version history when editing a game
 - [ ] Write some tests
-- [ ] Improve search with levensthein distance
+- [*] Improve search with levensthein distance
 - [*] Add sub args to create command

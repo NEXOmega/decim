@@ -1,7 +1,7 @@
 use clap::{arg, Command};
 use tabled::{settings::Style, Table};
 use crate::managers::game_manager;
-use crate::managers::game_manager::{search_games, start_game, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
+use crate::managers::game_manager::{search_games, start_game, list_games, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
 
 pub fn handle_command() {
     let matches = cli().get_matches();
@@ -12,7 +12,7 @@ pub fn handle_command() {
             start_game(format!("{}.json", game_name));
         },
         Some(("list", _sub_m)) => {
-            let games = search_games(String::from(""));
+            let games = list_games();
             let table = Table::new(&games).with(Style::modern()).to_string();
             println!("{}", table);
         },

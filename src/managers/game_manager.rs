@@ -22,7 +22,7 @@ pub(crate) fn start_game(string: String) {
     utils::file_runner::run_file(game.get_executable());
 }
 
-fn list_games() -> Vec<Game> {
+pub fn list_games() -> Vec<Game> {
     let mut games: Vec<Game> = Vec::new();
     for entry in std::fs::read_dir(utils::get_game_dir()).unwrap() {
         let path = entry.unwrap().path();
@@ -66,20 +66,19 @@ pub fn edit_game(game: Game) {
 }
 
 pub fn search_games(search: String) -> Vec<Game> {
+    let mut games_distance: Vec<(Game, usize)> = Vec::new();
+    for game in list_games() {
+        let mut distance = edit_distance::edit_distance(&game.get_name(), &search);
+        games_distance.push((game, distance));
+    }
+
+    games_distance.sort_by(|a, b| a.1.cmp(&b.1));
+    games_distance.retain(|x| x.1 <= 5);
+    games_distance.truncate(5);
+
     let mut games: Vec<Game> = Vec::new();
-    for entry in std::fs::read_dir(utils::get_game_dir()).unwrap() {
-        let path = entry.unwrap().path();
-        let file_name = path.file_name().unwrap().to_str().unwrap();
-        if file_name.ends_with(".json") {
-            let game = load_game(String::from(file_name));
-            if game.is_none() {
-                continue;
-            }
-            let game = game.unwrap();
-            if game.get_name().contains(&search) || game.get_description().contains(&search) {
-                games.push(game);
-            }
-        }
+    for game in games_distance {
+        games.push(game.0);
     }
     games
 }
