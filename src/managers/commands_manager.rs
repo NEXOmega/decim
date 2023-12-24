@@ -1,7 +1,7 @@
 use clap::{arg, Command};
 use tabled::{settings::Style, Table};
 use crate::managers::game_manager;
-use crate::managers::game_manager::{search_games, display_game, start_game, delete_game, search_games_by_tag, load_game, backup, backup_all};
+use crate::managers::game_manager::{search_games, display_game, start_game, delete_game, search_games_by_tag, load_game, backup, backup_all, search_games_by_tags};
 
 pub fn handle_command() {
     let matches = cli().get_matches();
@@ -23,19 +23,21 @@ pub fn handle_command() {
         Some(("search", sub_m)) => {
             let game_name = sub_m.get_one::<String>("NAME").unwrap();
             let games = search_games(game_name.to_string());
-            for game in games {
-                display_game(game);
-            }
+            let table = Table::new(&games).with(Style::modern()).to_string();
+            println!("{}", table);
         },
         Some(("search-tag", sub_m)) => {
             let tag = sub_m.get_one::<String>("TAG").unwrap();
             let games = search_games_by_tag(tag.to_string());
-            for game in games {
-                display_game(game);
-            }
+            let table = Table::new(&games).with(Style::modern()).to_string();
+            println!("{}", table);
         },
         Some(("search-tags", _sub_m)) => {
-            println!("Not implemented yet");
+            let tags = _sub_m.get_many::<String>("TAGS").unwrap();
+            let tags: Vec<_> = tags.map(|x| x.as_str()).collect();
+            let games = search_games_by_tags(tags);
+            let table = Table::new(&games).with(Style::modern()).to_string();
+            println!("{}", table);
         },
         Some(("create", sub_m)) => {
             let name = sub_m.get_one::<String>("NAME").unwrap();
@@ -63,11 +65,15 @@ pub fn handle_command() {
             }
 
             if let Some(version) = _sub_m.get_one::<String>("VERSION") {
-                game.version = version.to_string();
+                game.edit_version(version.to_string());
+            }
+
+            if let Some(save_location) = _sub_m.get_one::<String>("SAVE_LOCATION") {
+                game.edit_save_location(save_location.to_string());
             }
 
             if let Some(executable) = _sub_m.get_one::<String>("EXECUTABLE") {
-                game.executable = executable.to_string();
+                game.edit_executable(executable.to_string());
             }
 
             if let Some(tags) = _sub_m.get_many::<String>("TAGS") {

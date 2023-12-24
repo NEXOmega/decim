@@ -1,13 +1,6 @@
 pub mod game;
 pub(crate) mod file_runner;
 
-pub fn ask(string: String) -> String {
-    println!("{}", string);
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input).unwrap();
-    input.trim().to_string()
-}
-
 pub fn get_config_dir() -> String {
     let mut config_dir = String::from(std::env::var("HOME").unwrap());
     config_dir.push_str("/.config");

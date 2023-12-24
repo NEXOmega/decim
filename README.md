@@ -6,7 +6,8 @@ It will also allow the user to launch his game with a single command.
 
 TODO :
 - [ ] Auto-completion of commands
-- [ ] Remove cli because it's useless
+- [*] Remove cli because it's useless
 - [ ] Add restore for backups
 - [ ] Add version history when editing a game
 - [ ] Write some tests
+- [ ] Improve search with levensthein distance

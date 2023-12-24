@@ -39,12 +39,6 @@ impl Game {
         self.tags.push(tag);
     }
 
-    pub fn add_tags(&mut self, tags: Vec<String>) {
-        for tag in tags {
-            self.tags.push(tag);
-        }
-    }
-
     pub fn remove_tag(&mut self, tag: String) {
         let index = self.tags.iter().position(|x| *x == tag).unwrap();
         self.tags.remove(index);
