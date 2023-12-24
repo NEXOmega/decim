@@ -8,7 +8,7 @@ TODO :
 - [ ] Auto-completion of commands
 - [*] Remove cli because it's useless
 - [ ] Add restore for backups
-- [ ] Add version history when editing a game
+- [*] Add version history when editing a game
 - [ ] Write some tests
 - [ ] Improve search with levensthein distance
 - [*] Add sub args to create command
